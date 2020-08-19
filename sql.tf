@@ -1,5 +1,5 @@
 resource "google_sql_database_instance" "gitlab" {
-  name             = "gitlab2"
+  name             = "gitlab-${var.env}"
   database_version = "POSTGRES_12"
   region           = var.region
   project          = var.project_id
@@ -40,12 +40,11 @@ resource "google_sql_database" "gitlab" {
   depends_on = [google_sql_database_instance.gitlab]
 }
 
-resource "random_id" "root_password" {
+resource "random_password" "root_password" {
+  length = 16
   keepers = {
     name = google_sql_database_instance.gitlab.name
   }
-
-  byte_length = 8
   depends_on  = [google_sql_database_instance.gitlab]
 }
 
@@ -55,5 +54,5 @@ resource "google_sql_user" "root_user" {
   project  = var.project_id
   instance = google_sql_database_instance.gitlab.name
   name     = "postgres"
-  password = random_id.root_password.hex
+  password = random_password.root_password.result
 }
