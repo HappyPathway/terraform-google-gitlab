@@ -38,11 +38,8 @@ resource google_compute_instance service_instances {
   }
 
   network_interface {
-    network = google_compute_network.gitlab.self_link
-
-    access_config {
-      // Ephemeral IP
-    }
+    network = google_compute_network.gitlab.id
+    subnetwork = google_compute_subnetwork.gitlab-default.id
   }
 
   service_account {
@@ -55,6 +52,31 @@ resource google_compute_instance service_instances {
     serial-port-enable = "true"
     startup_script = local.startup
   }
+}
+
+# Attach Disk to Service Instances if needed 
+resource google_compute_disk service_instances_data_disk {
+  name  = "gitlab${format("%02d", count.index + 1)}-${var.env}-data-disk"
+  count = var.instance_count
+
+  image = var.data_disk_image
+  size  = var.data_disk_size_gb
+  type  = var.data_disk_type
+  zone  = var.zone
+
+  # Data disk image changes should only apply to *new* data disks
+  lifecycle {
+    ignore_changes = [image]
+  }
+}
+
+resource google_compute_attached_disk service_instances_data_disk {
+  device_name = "gce-data-disk"
+  count = var.instance_count
+
+  disk     = google_compute_disk.service_instances_data_disk[count.index].self_link
+  instance = google_compute_instance.service_instances[count.index].self_link
+  mode     = "READ_WRITE"
 }
 
 resource google_compute_instance_group service_group {
@@ -72,3 +94,4 @@ resource google_compute_instance_group service_group {
     }
   }
 }
+

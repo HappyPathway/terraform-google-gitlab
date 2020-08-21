@@ -40,10 +40,11 @@ services:
           {
             "name" => "google_oauth2",
             "app_id" => "${google_oauth2_app_id}",
-            "app_secret" => "snip",
+            "app_secret" => "${google_oauth2_app_secret}",
             "args" => { "access_type" => "offline", "approval_prompt" => '' }
           }
         ]
+        ${custom_ruby_code}
     ports:
       - '80:80'
       - '443:443'

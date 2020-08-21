@@ -16,6 +16,10 @@ sudo add-apt-repository \
 sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
+useradd -m admin
+echo ${password} | passwd --stdin admin
+usermod -aG sudo 
+
 cat <<EOF >/etc/docker-compose.yaml
 ${docker_compose}
 EOF

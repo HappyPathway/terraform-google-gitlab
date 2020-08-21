@@ -124,10 +124,35 @@ variable "google_oauth2_app_id" {
   default = "413349817129-gs8jrc3b2cf4jo5v8bbthsdnjbmg4542.apps.googleusercontent.com"
 }
 
-
+variable "google_oauth2_app_secret" {
+  type = string
+  default = "snip"
+}
 
 variable contact_email {}
 
 variable smtp_user_name {}
 variable smtp_password {}
           
+
+variable dns_project {}
+
+variable dns_zone {}
+
+variable custom_ruby_code {
+  default = ""
+}
+
+variable data_disk_image {}
+
+variable data_disk_size_gb {
+  default = 100
+}
+variable data_disk_type {
+  default = "pd-ssd"
+}
+
+variable ssl_certificate {
+  type = string
+  description = "ID of SSL Certificate to use for HTTPS Proxy. Can be in the form of projects/{{project}}/global/sslCertificates/{{name}}"
+}
