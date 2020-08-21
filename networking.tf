@@ -25,7 +25,7 @@ resource "google_compute_subnetwork" "gitlab-default" {
 
 resource "google_compute_subnetwork" "gitlab-proxy" {
   provider = google-beta
-  name          = "website-net-proxy"
+  name          = "gitlab-${var.env}"
   ip_cidr_range = "10.127.0.0/26"
   region        = var.region
   network       = google_compute_network.gitlab.id
