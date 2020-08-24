@@ -17,7 +17,7 @@ resource "google_compute_network" "gitlab" {
 
 resource "google_compute_subnetwork" "gitlab-default" {
   provider = google-beta
-  name          = "gitlab-${var.env}-default"
+  name          = "${var.hostname}-${var.env}-default"
   ip_cidr_range = "10.1.2.0/24"
   region        = var.region
   network       = google_compute_network.gitlab.id
@@ -25,7 +25,7 @@ resource "google_compute_subnetwork" "gitlab-default" {
 
 resource "google_compute_subnetwork" "gitlab-proxy" {
   provider = google-beta
-  name          = "gitlab-${var.env}"
+  name          = "${var.hostname}-${var.env}"
   ip_cidr_range = "10.127.0.0/26"
   region        = var.region
   network       = google_compute_network.gitlab.id
@@ -97,7 +97,7 @@ resource "google_compute_region_health_check" "gitlab" {
 
 resource "google_compute_region_backend_service" "gitlab" {
   region      = var.region
-  name        = "backend-gitlab-${var.env}"
+  name        = "backend-${var.hostname}-${var.env}"
   protocol    = "HTTPS"
   timeout_sec = 10
 
@@ -111,7 +111,7 @@ resource "google_compute_region_backend_service" "gitlab" {
 
 resource "google_compute_region_url_map" "gitlab" {
   region      = var.region
-  name        = "gitlab-map-${var.env}"
+  name        = "${var.hostname}-map-${var.env}"
 
   default_service = google_compute_region_backend_service.gitlab.id
 
@@ -134,7 +134,7 @@ resource "google_compute_region_url_map" "gitlab" {
 resource "google_compute_managed_ssl_certificate" "gitlab" {
   provider = google-beta
 
-  name = "gitlab-${var.env}"
+  name = "${var.hostname}-${var.env}"
 
   managed {
     domains = ["gitlab-${var.env}.${var.dns_domain}."]
@@ -154,7 +154,7 @@ resource "google_compute_region_target_https_proxy" "gitlab" {
 
 
 resource google_dns_record_set dns {
-  name    = "gitlab-${var.env}.${var.dns_domain}"
+  name    = "${var.hostname}-${var.env}.${var.dns_domain}"
   project = var.dns_project
   count   = var.instance_count
 

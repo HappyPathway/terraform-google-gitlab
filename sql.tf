@@ -1,5 +1,5 @@
 resource "google_sql_database_instance" "gitlab" {
-  name             = "gitlab-${var.env}"
+  name             = "${var.hostname}-${var.env}"
   database_version = "POSTGRES_12"
   region           = var.region
   project          = var.project_id

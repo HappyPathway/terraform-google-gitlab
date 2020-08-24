@@ -1,7 +1,7 @@
 
 
 resource google_compute_instance service_instances {
-  name  = "gitlab${format("%02d", count.index + 1)}-${var.env}"
+  name  = "${var.hostname}${format("%02d", count.index + 1)}-${var.env}"
   count = var.instance_count
   zone  = var.zone
 
@@ -48,7 +48,7 @@ resource google_compute_instance service_instances {
   }
 
   metadata = {
-    fqdn               = "gitlab${format("%02d", count.index + 1)}.${var.dns_domain}"
+    fqdn               = "${var.hostname}${format("%02d", count.index + 1)}.${var.dns_domain}"
     serial-port-enable = "true"
     startup_script = local.startup
   }
@@ -56,7 +56,7 @@ resource google_compute_instance service_instances {
 
 # Attach Disk to Service Instances if needed 
 resource google_compute_disk service_instances_data_disk {
-  name  = "gitlab${format("%02d", count.index + 1)}-${var.env}-data-disk"
+  name  = "${var.hostname}${format("%02d", count.index + 1)}-${var.env}-data-disk"
   count = var.instance_count
 
   image = var.data_disk_image
@@ -80,7 +80,7 @@ resource google_compute_attached_disk service_instances_data_disk {
 }
 
 resource google_compute_instance_group service_group {
-  name        = "gitlab-${var.env}"
+  name        = "${var.hostname}-${var.env}"
   description = "Service instance group for gitlab-${var.env}"
   zone        = var.zone
 

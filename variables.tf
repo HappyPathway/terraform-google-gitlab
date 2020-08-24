@@ -36,7 +36,7 @@ variable "domain" {
 variable "instance_tags" {
   type = list
   description = "tags to instance with"
-  default = []
+  default = ["gitlab-host"]
 }
 
 variable "allow_stopping" {
@@ -155,4 +155,9 @@ variable data_disk_type {
 variable ssl_certificate {
   type = string
   description = "ID of SSL Certificate to use for HTTPS Proxy. Can be in the form of projects/{{project}}/global/sslCertificates/{{name}}"
+}
+
+variable hostname {
+  default = "git"
+  type = string
 }

@@ -3,7 +3,7 @@ resource "random_password" "admin_password" {
 }
 
 locals {
-    host_name = "gitlab-${var.env}.${var.dns_domain}"
+    host_name = "${var.hostname}-${var.env}.${var.dns_domain}"
 
     docker_compose = templatefile(
         "${path.module}/templates/docker-compose.yaml.tpl", 
