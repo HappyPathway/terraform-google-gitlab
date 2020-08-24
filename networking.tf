@@ -43,7 +43,7 @@ resource "google_compute_forwarding_rule" "default" {
   ip_protocol           = "TCP"
   load_balancing_scheme = "INTERNAL_MANAGED"
   port_range            = "80"
-  target                = google_compute_region_target_http_proxy.gitlab.id
+  target                = google_compute_region_target_https_proxy.gitlab.id
   network               = google_compute_network.gitlab.id
   subnetwork            = google_compute_subnetwork.gitlab-default.id
   network_tier          = "PREMIUM"
@@ -130,7 +130,7 @@ resource "google_compute_region_url_map" "gitlab" {
     }
   }
 }
-/*
+
 resource "google_compute_managed_ssl_certificate" "gitlab" {
   provider = google-beta
 
@@ -140,19 +140,19 @@ resource "google_compute_managed_ssl_certificate" "gitlab" {
     domains = ["gitlab-${var.env}.${var.dns_domain}."]
   }
 }
-*/
 
-resource "google_compute_region_target_http_proxy" "gitlab" {
+
+resource "google_compute_region_target_https_proxy" "gitlab" {
   region           = var.region
   name             = "gitlab-${var.env}"
   url_map          = google_compute_region_url_map.gitlab.id
-  # ssl_certificates = [google_compute_managed_ssl_certificate.gitlab.id]
-  # depends_on = [
-  #  google_compute_managed_ssl_certificate.gitlab
-  # ]
+  ssl_certificates = [google_compute_managed_ssl_certificate.gitlab.id]
+  depends_on = [
+    google_compute_managed_ssl_certificate.gitlab
+  ]
 }
 
-/*
+
 resource google_dns_record_set dns {
   name    = "gitlab-${var.env}.${var.dns_domain}"
   project = var.dns_project
@@ -165,4 +165,3 @@ resource google_dns_record_set dns {
 
   rrdatas = [ google_compute_forwarding_rule.default.ip_address ]
 }
-*/
