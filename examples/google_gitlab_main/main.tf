@@ -4,10 +4,18 @@ data "google_project" "sandbox_project" {
 data "google_compute_default_service_account" "default" {
 }
 
+resource "random_string" "random" {
+  length = 4
+  special = false
+  upper = false
+  number = false
+}
+
+
 module "gitlab" {
   source           = "../../"
   project_id       = var.project_id
-  env = "sandbox-${var.random}"
+  env = "sandbox-${random_string.random.result}"
   instance_count = 1
   service_account = data.google_compute_default_service_account.default.email
   scopes = ["cloud-platform"]
