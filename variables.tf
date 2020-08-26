@@ -72,7 +72,7 @@ variable "disk_size" {
 variable "dns_domain" {
   type = string
   description = "DNS Domain Name"
-  default = "hawkfish.us"
+  default = "hfeng.dev"
 }
 
 variable "service_ports" {

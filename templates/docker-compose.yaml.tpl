@@ -46,9 +46,9 @@ services:
         ]
         ${custom_ruby_code}
     ports:
-      - '80:80'
-      - '443:443'
-      - '22:22'
+      - '8080:80'
+      - '8443:443'
+      - '2222:22'
     volumes:
       - '/opt/gitlab/home/config:/etc/gitlab'
       - '/opt/gitlab/home/logs:/var/log/gitlab'

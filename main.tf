@@ -48,10 +48,10 @@ resource google_compute_instance service_instances {
     scopes = var.scopes
   }
 
+  metadata_startup_script = local.startup
   metadata = {
-    fqdn               = "${var.hostname}${format("%02d", count.index + 1)}.${var.dns_domain}"
+    fqdn               = "${var.hostname}-${var.env}.${var.dns_domain}"
     serial-port-enable = "true"
-    startup_script = local.startup
   }
 }
 
