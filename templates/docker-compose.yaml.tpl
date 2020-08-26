@@ -1,9 +1,9 @@
-version: "3.8"
+version: "3.3"
 services:
   db_proxy:
     image: 'gcr.io/cloudsql-docker/gce-proxy:1.16'
     restart: always
-    command: /cloud_sql_proxy --dir=/cloudsql -instances=hf-tf-d-tech-preston-sandbox:us-central1:gitlab=tcp:0.0.0.0:5432
+    command: /cloud_sql_proxy --dir=/cloudsql -instances=${db_project}:${db_region}:${db_instance}=tcp:0.0.0.0:5432
     ports:
       - '127.0.0.1:5432:5432'
   web:

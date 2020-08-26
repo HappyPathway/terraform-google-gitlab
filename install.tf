@@ -12,11 +12,15 @@ locals {
           contact_email = var.contact_email,
           db_username = google_sql_user.root_user.name,
           db_password = random_password.root_password.result,
+          db_project = data.google_project.project.name,
+          db_region = var.region
+          db_instance = google_sql_database_instance.gitlab.name
           smtp_user_name = var.smtp_user_name,
           smtp_password = var.smtp_password,
           google_oauth2_app_id = var.google_oauth2_app_id,
           google_oauth2_app_secret = var.google_oauth2_app_secret,
           custom_ruby_code = var.custom_ruby_code
+
         }
     )
 

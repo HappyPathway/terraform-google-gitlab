@@ -16,7 +16,7 @@ module "gitlab" {
   smtp_password = var.smtp_password
   compute_image = var.compute_image
   dns_project = var.project_id
-  dns_zone = "hawkfish.us"
+  dns_zone = "hfenv.dev"
   data_disk_image = "projects/hf-tf-d-tech-dave-sandbox/global/images/gitlab-datadisk"
   data_disk_size_gb = 500
   ssl_certificate = "projects/hf-tf-d-tech-dave-sandbox/global/sslCertificates/dave-sandbox-test"

@@ -30,7 +30,7 @@ variable "db_machine_type" {
 variable "domain" {
   type = string
   description = "Full host name where Gitlab will be deployed"
-  default = "hawkfish.us"
+  default = "hfeng.dev"
 }
 
 variable "instance_tags" {
@@ -117,6 +117,10 @@ variable service_account {
 
 variable scopes {
   type = list
+  default = [
+    "https://www.googleapis.com/auth/sqlservice.admin",
+    "https://www.googleapis.com/auth/devstorage.read_write"
+  ]
 }
 
 variable "google_oauth2_app_id" {
@@ -160,4 +164,9 @@ variable ssl_certificate {
 variable hostname {
   default = "git"
   type = string
+}
+
+variable enable_dns {
+  default = false
+  description = "Enable DNS. Default will be set to True once DNS project is setup"
 }

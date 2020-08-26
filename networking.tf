@@ -9,7 +9,7 @@ data "google_netblock_ip_ranges" "iap_forwarder_netblock_ranges" {
 
 ### General Networking and Firewalls ###
 resource "google_compute_network" "gitlab" {
-  name                    = "net-gitlab-${var.env}"
+  name                    = "net-git-${var.env}"
   project                 = var.project_id
   auto_create_subnetworks = true
 }
@@ -34,19 +34,19 @@ resource "google_compute_subnetwork" "gitlab-proxy" {
 }
 
 // Forwarding rule for Internal Load Balancing
-resource "google_compute_forwarding_rule" "default" {
+resource "google_compute_global_forwarding_rule" "default" {
   provider = google-beta
   depends_on = [google_compute_subnetwork.gitlab-proxy]
-  name   = "gitlab-${var.env}"
-  region = var.region
+  name   = "git-${var.env}"
+  # region = var.region
 
   ip_protocol           = "TCP"
-  load_balancing_scheme = "INTERNAL_MANAGED"
-  port_range            = "80"
-  target                = google_compute_region_target_https_proxy.gitlab.id
-  network               = google_compute_network.gitlab.id
-  subnetwork            = google_compute_subnetwork.gitlab-default.id
-  network_tier          = "PREMIUM"
+  # load_balancing_scheme = "INTERNAL_MANAGED"
+  port_range            = "443"
+  target                = google_compute_target_https_proxy.gitlab.id
+  # network               = google_compute_network.gitlab.id
+  # subnetwork            = google_compute_subnetwork.gitlab-default.id
+  # network_tier          = "PREMIUM"
 }
 
 resource "google_compute_firewall" "allow_glb_healthcheckers" {
@@ -86,8 +86,8 @@ resource "google_compute_firewall" "allow_tcp_iap_ssh" {
 
 
 ### Load Balancer Setup ###
-resource "google_compute_region_health_check" "gitlab" {
-  region = "us-central1"
+resource "google_compute_health_check" "gitlab" {
+  # region = "us-central1"
   name   = "http-health-check-${var.env}"
   https_health_check {
     port = 8443
@@ -95,10 +95,10 @@ resource "google_compute_region_health_check" "gitlab" {
   }
 }
 
-resource "google_compute_region_backend_service" "gitlab" {
-  region      = var.region
+resource "google_compute_backend_service" "gitlab" {
+  #region      = var.region
   name        = "backend-${var.hostname}-${var.env}"
-  protocol    = "HTTPS"
+  protocol    = "HTTP"
   timeout_sec = 10
 
   backend {
@@ -106,14 +106,14 @@ resource "google_compute_region_backend_service" "gitlab" {
     balancing_mode = "UTILIZATION"
   }
 
-  health_checks = [google_compute_region_health_check.gitlab.id]
+  health_checks = [google_compute_health_check.gitlab.id]
 }
 
-resource "google_compute_region_url_map" "gitlab" {
-  region      = var.region
+resource "google_compute_url_map" "gitlab" {
+  # region      = var.region
   name        = "${var.hostname}-map-${var.env}"
 
-  default_service = google_compute_region_backend_service.gitlab.id
+  default_service = google_compute_backend_service.gitlab.id
 
   host_rule {
     hosts        = [var.domain]
@@ -122,11 +122,11 @@ resource "google_compute_region_url_map" "gitlab" {
 
   path_matcher {
     name            = "allpaths"
-    default_service = google_compute_region_backend_service.gitlab.id
+    default_service = google_compute_backend_service.gitlab.id
 
     path_rule {
       paths   = ["/*"]
-      service = google_compute_region_backend_service.gitlab.id
+      service = google_compute_backend_service.gitlab.id
     }
   }
 }
@@ -137,15 +137,15 @@ resource "google_compute_managed_ssl_certificate" "gitlab" {
   name = "${var.hostname}-${var.env}"
 
   managed {
-    domains = ["gitlab-${var.env}.${var.dns_domain}."]
+    domains = ["${var.hostname}-${var.env}.${var.dns_domain}."]
   }
 }
 
 
-resource "google_compute_region_target_https_proxy" "gitlab" {
-  region           = var.region
-  name             = "gitlab-${var.env}"
-  url_map          = google_compute_region_url_map.gitlab.id
+resource "google_compute_target_https_proxy" "gitlab" {
+  # region           = var.region
+  name             = var.hostname
+  url_map          = google_compute_url_map.gitlab.id
   ssl_certificates = [google_compute_managed_ssl_certificate.gitlab.id]
   depends_on = [
     google_compute_managed_ssl_certificate.gitlab
@@ -154,14 +154,14 @@ resource "google_compute_region_target_https_proxy" "gitlab" {
 
 
 resource google_dns_record_set dns {
+  count = var.enable_dns ? var.instance_count : 0
   name    = "${var.hostname}-${var.env}.${var.dns_domain}"
   project = var.dns_project
-  count   = var.instance_count
 
   type = "A"
   ttl  = 300
 
   managed_zone = var.dns_zone
 
-  rrdatas = [ google_compute_forwarding_rule.default.ip_address ]
+  rrdatas = [ google_compute_global_forwarding_rule.default.ip_address ]
 }

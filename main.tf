@@ -1,4 +1,5 @@
-
+data "google_project" "project" {
+}
 
 resource google_compute_instance service_instances {
   name  = "${var.hostname}${format("%02d", count.index + 1)}-${var.env}"
