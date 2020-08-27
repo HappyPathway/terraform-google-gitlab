@@ -19,7 +19,7 @@ module "gitlab" {
   instance_count = 1
   service_account = data.google_compute_default_service_account.default.email
   scopes = ["cloud-platform"]
-  contact_email = "dave-cft@hawkfish.us"
+  contact_email = "dave@happypathway.com"
   smtp_user_name = var.smtp_user_name
   smtp_password = var.smtp_password
   compute_image = var.compute_image
