@@ -11,7 +11,7 @@ services:
       - "db_proxy"
     image: 'gitlab/gitlab-ee:latest'
     restart: always
-    hostname: 'preston-gitlab.hawkfish.dev'
+    hostname: '${host_name}'
     environment:
       GITLAB_OMNIBUS_CONFIG: |
         letsencrypt['enable'] = false
